@@ -3,9 +3,33 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
-st.title("AI Mini Project")
+# Page setup
+st.set_page_config(page_title="AI Mini Project", layout="centered")
 
-# Fake News Model
+# Custom style
+st.markdown("""
+<style>
+body {
+    background-color: #f5f7fa;
+}
+h1 {
+    text-align: center;
+    color: #2c3e50;
+}
+.stButton>button {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 10px;
+    height: 3em;
+    width: 100%;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.title("🧠 AI Mini Project")
+st.markdown("---")
+
+# Model
 data = {
     "text": [
         "Government passes new law",
@@ -22,30 +46,44 @@ X = vectorizer.fit_transform(df["text"])
 model = MultinomialNB()
 model.fit(X, df["label"])
 
-# Fake News UI
-st.header("Fake News Detection")
-news = st.text_input("Enter news")
+# Layout
+col1, col2 = st.columns(2)
 
-if st.button("Check News"):
-    if news:
-        pred = model.predict(vectorizer.transform([news]))
-        if pred[0] == 1:
-            st.success("Real News")
+# Fake News
+with col1:
+    st.subheader("📰 Fake News Detection")
+    news = st.text_area("Enter news")
+
+    if st.button("Check News"):
+        if news:
+            pred = model.predict(vectorizer.transform([news]))
+            if pred[0] == 1:
+                st.success("✅ Real News")
+            else:
+                st.error("❌ Fake News")
         else:
-            st.error("Fake News")
+            st.warning("Enter news")
 
-# Resume Screening
-st.header("Resume Screening")
-resume = st.text_input("Resume Skills")
-job = st.text_input("Job Requirements")
+# Resume
+with col2:
+    st.subheader("💼 Resume Screening")
+    resume = st.text_area("Resume Skills")
+    job = st.text_area("Job Requirements")
 
-if st.button("Check Resume"):
-    if resume and job:
-        resume_words = resume.lower().split()
-        job_words = job.lower().split()
-        score = sum(1 for word in job_words if word in resume_words)
+    if st.button("Check Resume"):
+        if resume and job:
+            resume_words = resume.lower().split()
+            job_words = job.lower().split()
+            score = sum(1 for word in job_words if word in resume_words)
 
-        if score >= len(job_words)//2:
-            st.success("Selected")
+            st.info(f"Score: {score}")
+
+            if score >= len(job_words)//2:
+                st.success("✅ Selected")
+            else:
+                st.error("❌ Rejected")
         else:
-            st.error("Rejected")
+            st.warning("Enter both fields")
+
+st.markdown("---")
+st.caption("Developed by Abhas Chaubey")
