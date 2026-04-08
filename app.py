@@ -68,24 +68,62 @@ with col1:
 
 # Resume Section
 with col2:
-    st.subheader("💼 Resume Screening")
-    resume = st.text_area("Resume Skills")
-    job = st.text_area("Job Requirements")
+    st.subheader("💼 Smart Resume Analyzer")
 
-    if st.button("Check Resume"):
-        if resume and job:
-            resume_words = resume.lower().split()
-            job_words = job.lower().split()
-            score = sum(1 for word in job_words if word in resume_words)
+    uploaded_file = st.file_uploader("📂 Upload Resume (TXT)", type=["txt"])
+    job = st.text_area("📝 Enter Job Requirements (skills separated by space)")
 
-            st.info(f"Matching Score: {score}")
+    if st.button("🔍 Analyze Resume"):
+        if uploaded_file is not None and job:
 
-            if score >= len(job_words)//2:
-                st.success("✅ Candidate Selected")
+            # Read resume
+            resume = uploaded_file.read().decode("utf-8").lower()
+            job = job.lower()
+
+            resume_words = resume.split()
+            job_words = job.split()
+
+            # Matching logic
+            matched = [word for word in job_words if word in resume_words]
+            missing = [word for word in job_words if word not in resume_words]
+
+            score = len(matched)
+            match_percent = int((score / len(job_words)) * 100)
+
+            # UI OUTPUT
+            st.markdown("### 📊 Analysis Dashboard")
+
+            # Progress
+            st.progress(match_percent / 100)
+
+            # Score + Rating
+            if match_percent >= 80:
+                rating = "🌟 Excellent"
+            elif match_percent >= 60:
+                rating = "👍 Good"
+            elif match_percent >= 40:
+                rating = "⚠️ Average"
             else:
-                st.error("❌ Candidate Rejected")
-        else:
-            st.warning("Enter both fields")
+                rating = "❌ Poor"
 
-st.markdown("---")
-st.caption("Developed by Abhas Chaubey")
+            st.markdown(f"### 🎯 Match Score: {match_percent}%")
+            st.markdown(f"### ⭐ Rating: {rating}")
+
+            # Cards
+            colA, colB = st.columns(2)
+
+            with colA:
+                st.success(f"✅ Matched Skills:\n{matched}")
+
+            with colB:
+                st.warning(f"❗ Missing Skills:\n{missing}")
+
+            # Decision
+            st.markdown("---")
+            if match_percent >= 50:
+                st.success("🎉 Final Result: Candidate Selected")
+            else:
+                st.error("❌ Final Result: Candidate Rejected")
+
+        else:
+            st.warning("⚠️ Upload resume and enter job requirements")
