@@ -3,10 +3,9 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
-# Page setup
 st.set_page_config(page_title="AI Mini Project", layout="centered")
 
-# Background + Style
+# Styling
 st.markdown("""
 <style>
 [data-testid="stAppViewContainer"] {
@@ -14,14 +13,11 @@ st.markdown("""
 }
 h1 {
     text-align: center;
-    color: #1f2937;
 }
 .stButton>button {
     background-color: #4CAF50;
     color: white;
     border-radius: 10px;
-    height: 3em;
-    width: 100%;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -29,9 +25,13 @@ h1 {
 # Title
 st.markdown("<h1>🧠 AI Powered System</h1>", unsafe_allow_html=True)
 st.markdown("### Fake News Detection & Resume Screening")
-st.markdown("---")
 
-# Model
+# Tabs
+tab1, tab2 = st.tabs(["📰 Fake News", "💼 Resume Analyzer"])
+
+# -------------------------
+# Fake News
+# -------------------------
 data = {
     "text": [
         "Government passes new law",
@@ -48,13 +48,9 @@ X = vectorizer.fit_transform(df["text"])
 model = MultinomialNB()
 model.fit(X, df["label"])
 
-# Layout
-col1, col2 = st.columns(2)
-
-# Fake News Section
-with col1:
+with tab1:
     st.subheader("📰 Fake News Detection")
-    news = st.text_area("Enter News Here")
+    news = st.text_area("Enter News")
 
     if st.button("Check News"):
         if news:
@@ -64,66 +60,74 @@ with col1:
             else:
                 st.error("❌ Fake News")
         else:
-            st.warning("Please enter news")
+            st.warning("Enter news first")
 
-# Resume Section
-with col2:
+# -------------------------
+# Resume Analyzer
+# -------------------------
+with tab2:
     st.subheader("💼 Smart Resume Analyzer")
 
-    uploaded_file = st.file_uploader("📂 Upload Resume (TXT)", type=["txt"])
-    job = st.text_area("📝 Enter Job Requirements (skills separated by space)")
+    uploaded_file = st.file_uploader("Upload Resume (TXT)", type=["txt"])
+    job = st.text_area("Enter Job Requirements")
 
-    if st.button("🔍 Analyze Resume"):
-        if uploaded_file is not None and job:
+    if st.button("Analyze Resume"):
+        if uploaded_file and job:
 
-            # Read resume
             resume = uploaded_file.read().decode("utf-8").lower()
             job = job.lower()
 
             resume_words = resume.split()
             job_words = job.split()
 
-            # Matching logic
-            matched = [word for word in job_words if word in resume_words]
-            missing = [word for word in job_words if word not in resume_words]
+            matched = [w for w in job_words if w in resume_words]
+            missing = [w for w in job_words if w not in resume_words]
 
             score = len(matched)
-            match_percent = int((score / len(job_words)) * 100)
+            percent = int((score / len(job_words)) * 100)
 
-            # UI OUTPUT
             st.markdown("### 📊 Analysis Dashboard")
+            st.progress(percent / 100)
+            st.write(f"### 🎯 Match Score: {percent}%")
 
-            # Progress
-            st.progress(match_percent / 100)
-
-            # Score + Rating
-            if match_percent >= 80:
+            # Rating
+            if percent >= 80:
                 rating = "🌟 Excellent"
-            elif match_percent >= 60:
+            elif percent >= 60:
                 rating = "👍 Good"
-            elif match_percent >= 40:
+            elif percent >= 40:
                 rating = "⚠️ Average"
             else:
                 rating = "❌ Poor"
 
-            st.markdown(f"### 🎯 Match Score: {match_percent}%")
-            st.markdown(f"### ⭐ Rating: {rating}")
+            st.write(f"### ⭐ Rating: {rating}")
 
-            # Cards
-            colA, colB = st.columns(2)
+            # Skills display
+            col1, col2 = st.columns(2)
 
-            with colA:
-                st.success(f"✅ Matched Skills:\n{matched}")
+            with col1:
+                st.markdown("### ✅ Matched Skills")
+                for skill in matched:
+                    st.markdown(f"- 🟢 {skill}")
 
-            with colB:
-                st.warning(f"❗ Missing Skills:\n{missing}")
+            with col2:
+                st.markdown("### ❗ Missing Skills")
+                for skill in missing:
+                    st.markdown(f"- 🔴 {skill}")
 
-            # Decision
-            st.markdown("---")
-            if match_percent >= 50:
-                st.success("🎉 Final Result: Candidate Selected")
+            # Resume Preview
+            st.markdown("### 📄 Resume Preview")
+            st.text(resume[:300])
+
+            # Smart suggestion
+            if percent >= 70:
+                st.success("🎉 Candidate Selected")
+                st.info("💡 Highly suitable for the job")
+            elif percent >= 40:
+                st.warning("⚠️ Candidate needs improvement")
+                st.info(f"💡 Improve skills: {missing}")
             else:
-                st.error("❌ Final Result: Candidate Rejected")
+                st.error("❌ Candidate Rejected")
 
         else:
-            st.warning("⚠️ Upload resume and enter job requirements")
+            st.warning("Upload resume and enter job")
