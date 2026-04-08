@@ -23,11 +23,11 @@ h1 {
 """, unsafe_allow_html=True)
 
 # Title
-st.markdown("<h1>🧠 AI Powered System</h1>", unsafe_allow_html=True)
+st.markdown("<h1> AI Powered System</h1>", unsafe_allow_html=True)
 st.markdown("### Fake News Detection & Resume Screening")
 
 # Tabs
-tab1, tab2 = st.tabs(["📰 Fake News", "💼 Resume Analyzer"])
+tab1, tab2 = st.tabs(["📰 Fake News", " Resume Analyzer"])
 
 # -------------------------
 # Fake News
@@ -66,7 +66,7 @@ with tab1:
 # Resume Analyzer
 # -------------------------
 with tab2:
-    st.subheader("💼 Smart Resume Analyzer")
+    st.subheader(" Smart Resume Analyzer")
 
     uploaded_file = st.file_uploader("Upload Resume (TXT)", type=["txt"])
     job = st.text_area("Enter Job Requirements")
