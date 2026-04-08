@@ -27,7 +27,7 @@ st.markdown("<h1> AI Powered System</h1>", unsafe_allow_html=True)
 st.markdown("### Fake News Detection & Resume Screening")
 
 # Tabs
-tab1, tab2 = st.tabs(["📰 Fake News", " Resume Analyzer"])
+tab1, tab2 = st.tabs([" Fake News", " Resume Analyzer"])
 
 # -------------------------
 # Fake News
